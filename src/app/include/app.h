@@ -8,6 +8,7 @@
 #include <GL/gl.h>
 
 #include "types.h"
+#include "key_manager.h"
 #include "window.h"
 #include "graphics.h"
 
@@ -17,6 +18,7 @@ private:
 
 public:
     GRAPHICS Graphics;
+    KEY_MANAGER KeyManager;
 
     bool running = 1;
 

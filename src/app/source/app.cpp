@@ -43,6 +43,8 @@ SDL_Event APP::poll_events() {
 
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) running = APP_FALSE;
+        else if (e.type == SDL_KEYDOWN) KeyManager.check_key_down(e);
+        else if (e.type == SDL_KEYUP) KeyManager.check_key_up(e);
     }
 
     return e;

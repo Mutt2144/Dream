@@ -26,6 +26,10 @@ void loop() {
     while (App.running) {
         SDL_Event e = App.poll_events();
 
+        if (App.KeyManager.keys[APP_DOWN]) {
+            image.square.position.y -= 1.0f;
+        }
+
         App.Graphics.Draw.clear_color({0.2f, 0.3f, 0.3f, 1.0f});
         App.Graphics.Draw.clear();
 

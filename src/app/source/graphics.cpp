@@ -109,26 +109,3 @@ GLuint GRAPHICS::load_texture(c_char* fileName) {
     SDL_FreeSurface(surface_format);
     return texture;
 }
-
-/*GLuint GRAPHICS::load_texture(c_char* fileName) {
-    GLuint texture;
-    SDL_Surface* surface = IMG_lo(fileName);
-    if (!surface) {
-        std::cerr << "Failed to load texture: " << SDL_GetError() << "\n";
-        return 0;
-    }
-    SDL_Surface* surface_format = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
-    SDL_FreeSurface(surface);
-    if (!surface_format) {
-        std::cerr << "Failed to load texture: " << SDL_GetError() << "\n";
-        return 0;
-    }
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface_format->w, surface_format->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface_format->pixels);
-    SDL_FreeSurface(surface_format);
-    return texture;
-}*/

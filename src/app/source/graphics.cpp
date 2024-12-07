@@ -1,5 +1,41 @@
 #include "../include/graphics.h"
 
+TTF_Font* GRAPHICS::font = nullptr;
+
+GLuint DRAW::create_text_texture(TTF_Font* font, c_char* text, COLOR c, int& w, int& h) {
+    SDL_Color color = { 
+        255,
+        255,
+        255,
+        255,
+    }; 
+    
+    SDL_Surface* textureSurface = TTF_RenderText_Blended(font, text, color);
+    if (!textureSurface) {
+        std::cerr << "Cannot render text: " << TTF_GetError() << "\n";
+        return 0;
+    }
+
+    w = textureSurface->w;
+    h = textureSurface->h;
+
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSurface->w, textureSurface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureSurface->pixels);
+    SDL_FreeSurface(textureSurface);
+
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "Failed to load OpenGL texture.\n";
+        return 0;
+    }
+
+    return texture;
+}
+
 void DRAW::clear_color(COLOR c) {
     glClearColor(c.r, c.g, c.b, c.a);
 }
@@ -64,7 +100,30 @@ void DRAW::image(SHAPE_IMAGE image, int blend_mode) {
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
     if (blend_mode == BLEND_ON) glDisable(GL_BLEND);
+}
+
+void DRAW::text(c_char* text, VECTOR2D position, COLOR color, TTF_Font* font) {
+    int w, h;
+    GLuint texture = create_text_texture(font, text, color, w, h);
+    if (texture == 0) {
+        std::cerr << "Failed to generate text\n";
+        return;
+    }
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);   glVertex2f(position.x,     position.y);
+        glTexCoord2f(1.0f, 0.0f);   glVertex2f(position.x + w, position.y);
+        glTexCoord2f(1.0f, 1.0f);   glVertex2f(position.x + w, position.y + h);
+        glTexCoord2f(0.0f, 1.0f);   glVertex2f(position.x,     position.y + h);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
 }
 
 bool GRAPHICS::create_context(SDL_Window* _window, int w, int h) {
@@ -74,8 +133,14 @@ bool GRAPHICS::create_context(SDL_Window* _window, int w, int h) {
         return APP_FALSE;
     }
 
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-w/2, w/2, -h/2, h/2, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     Draw.graphic_window = _window;
 
@@ -108,4 +173,18 @@ GLuint GRAPHICS::load_texture(c_char* fileName) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface_format->w, surface_format->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface_format->pixels);
     SDL_FreeSurface(surface_format);
     return texture;
+}
+
+TTF_Font* GRAPHICS::load_font(c_char* fileName, int size) {
+    TTF_Font* font = TTF_OpenFont(fileName, size);
+    if (!font) {
+        std::cerr << "Cannot load the font: " << TTF_GetError() << "\n";
+        return nullptr;
+    }
+
+    return font;
+}
+
+void GRAPHICS::delete_font(TTF_Font* font) {
+    TTF_CloseFont(font);
 }

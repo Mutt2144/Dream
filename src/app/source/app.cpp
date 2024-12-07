@@ -15,6 +15,12 @@ bool APP::init(int w, int h, c_char* title) {
         return APP_FALSE;
     }
 
+    if (TTF_Init() < 0) {
+        std::cerr << "Failed do Load TTF Dependencies: " << TTF_GetError() << "\n";
+        std::cerr << "[ABORTED]\n";
+        return APP_FALSE;
+    }
+
     printf("Process: [WINDOW->create_window] started.\n");
     if (!Window.create_window(w, h, title)) {
         std::cerr << "[ABORTED]\n";

@@ -12,7 +12,8 @@
 
 class DRAW {
 private:
-    GLuint create_text_texture(TTF_Font* font, c_char* text, COLOR c, int& w, int& h);
+    SDL_Texture* create_text_texture(TTF_Font* font, c_char* text, COLOR c);
+    void bind_texture(GLuint id);
 public:
     SDL_Window* graphic_window;
 

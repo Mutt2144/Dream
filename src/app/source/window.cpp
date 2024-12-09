@@ -3,7 +3,7 @@
 bool WINDOW::create_window(int w, int h, const char* title) {
     std::cout << "Window: " << w << "x" << h << "\n";
 
-    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     if (!window) {
         std::cerr << "Failed to create the window: " << SDL_GetError() << "\n";
         return APP_FALSE;

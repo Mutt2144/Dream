@@ -2,38 +2,12 @@
 
 TTF_Font* GRAPHICS::font = nullptr;
 
-GLuint DRAW::create_text_texture(TTF_Font* font, c_char* text, COLOR c, int& w, int& h) {
-    SDL_Color color = { 
-        255,
-        255,
-        255,
-        255,
-    }; 
-    
-    SDL_Surface* textureSurface = TTF_RenderText_Blended(font, text, color);
-    if (!textureSurface) {
-        std::cerr << "Cannot render text: " << TTF_GetError() << "\n";
-        return 0;
-    }
+SDL_Texture* DRAW::create_text_texture(TTF_Font* font, c_char* text, COLOR c) {
+    return nullptr;
+}
 
-    w = textureSurface->w;
-    h = textureSurface->h;
-
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSurface->w, textureSurface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureSurface->pixels);
-    SDL_FreeSurface(textureSurface);
-
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "Failed to load OpenGL texture.\n";
-        return 0;
-    }
-
-    return texture;
+void DRAW::bind_texture(GLuint id) {
+    glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void DRAW::clear_color(COLOR c) {
@@ -105,25 +79,6 @@ void DRAW::image(SHAPE_IMAGE image, int blend_mode) {
 }
 
 void DRAW::text(c_char* text, VECTOR2D position, COLOR color, TTF_Font* font) {
-    int w, h;
-    GLuint texture = create_text_texture(font, text, color, w, h);
-    if (texture == 0) {
-        std::cerr << "Failed to generate text\n";
-        return;
-    }
-
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f);   glVertex2f(position.x,     position.y);
-        glTexCoord2f(1.0f, 0.0f);   glVertex2f(position.x + w, position.y);
-        glTexCoord2f(1.0f, 1.0f);   glVertex2f(position.x + w, position.y + h);
-        glTexCoord2f(0.0f, 1.0f);   glVertex2f(position.x,     position.y + h);
-    glEnd();
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDisable(GL_TEXTURE_2D);
 }
 
 bool GRAPHICS::create_context(SDL_Window* _window, int w, int h) {
